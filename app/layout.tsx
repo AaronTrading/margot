@@ -13,6 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000',
+  ),
   title: 'Margot Atlani - Diététicienne à Saint-Alban',
   description:
     'Margot Atlani, diététicienne à Saint-Alban. Consultations en nutrition, rééquilibrage alimentaire, suivi sportif et intolérances alimentaires.',
