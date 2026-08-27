@@ -1,6 +1,8 @@
 const doctolibUrl =
   'https://www.doctolib.fr/dieteticien/saint-alban/margot-atlani';
 const instagramUrl = 'https://www.instagram.com/margot.diet/';
+const mapEmbedUrl =
+  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2885.217845980032!2d1.4049594770763894!3d43.68523427110062!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12aea5f736113023%3A0x91f26609acdeeba1!2sAtlani%20Margot%20-%20Di%C3%A9t%C3%A9ticienne!5e0!3m2!1sfr!2sfr!4v1787851319185!5m2!1sfr!2sfr';
 
 const supportAreas = [
   'Rééquilibrage alimentaire',
@@ -154,6 +156,15 @@ export default function Home() {
             <p>Chèques, espèces et virement bancaire.</p>
             <p className="muted">Carte Vitale non acceptée.</p>
           </article>
+        </div>
+        <div className="map-panel">
+          <iframe
+            src={mapEmbedUrl}
+            title="Carte du cabinet de Margot Atlani à Saint-Alban"
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="strict-origin-when-cross-origin"
+          />
         </div>
       </section>
 
