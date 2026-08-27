@@ -1,21 +1,12 @@
 import { requireAdmin } from '@/lib/adminAuth';
+import { resourcePayload } from '@/lib/resources';
 import {
   adminApiError,
   getSupabaseAdmin,
-  normalizeEmpty,
   supabaseErrorResponse,
 } from '@/lib/supabaseAdmin';
 
 export const runtime = 'nodejs';
-
-function resourcePayload(body: Record<string, unknown>) {
-  return {
-    content: normalizeEmpty(body.content),
-    note: normalizeEmpty(body.note),
-    title: normalizeEmpty(body.title),
-    type: normalizeEmpty(body.type) ?? 'other',
-  };
-}
 
 export async function GET() {
   try {
@@ -56,6 +47,13 @@ export async function POST(request: Request) {
 
     if (!payload.title) {
       return Response.json({ error: 'Le titre est requis.' }, { status: 400 });
+    }
+
+    if (payload.type === 'recipe' && !payload.category) {
+      return Response.json(
+        { error: 'La catégorie est requise pour une recette.' },
+        { status: 400 },
+      );
     }
 
     const { data, error } = await getSupabaseAdmin()

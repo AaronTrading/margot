@@ -48,10 +48,15 @@ type Reminder = {
 };
 
 type Resource = {
+  category: string | null;
   content: string | null;
   created_at: string;
+  description: string | null;
+  difficulty: string | null;
   id: string;
+  image: string | null;
   note: string | null;
+  prep_time: string | null;
   title: string;
   type: ResourceType;
   updated_at: string;
@@ -90,8 +95,13 @@ const emptyReminder = {
 };
 
 const emptyResource = {
+  category: 'breakfast',
   content: '',
+  description: '',
+  difficulty: 'Facile',
+  image: '',
   note: '',
+  prep_time: '',
   title: '',
   type: 'advice',
 };
@@ -404,8 +414,13 @@ export default function AdminPanel() {
   function editResource(resource: Resource) {
     setEditingResourceId(resource.id);
     setResourceForm({
+      category: resource.category ?? 'breakfast',
       content: resource.content ?? '',
+      description: resource.description ?? '',
+      difficulty: resource.difficulty ?? 'Facile',
+      image: resource.image ?? '',
       note: resource.note ?? '',
+      prep_time: resource.prep_time ?? '',
       title: resource.title,
       type: resource.type,
     });
@@ -951,16 +966,109 @@ export default function AdminPanel() {
                 </select>
               </label>
             </div>
-            <label>
-              Lien ou texte
-              <textarea
-                onChange={(event) =>
-                  setResourceForm({ ...resourceForm, content: event.target.value })
-                }
-                rows={2}
-                value={resourceForm.content}
-              />
-            </label>
+            {resourceForm.type === 'recipe' ? (
+              <>
+                <label>
+                  Description
+                  <textarea
+                    onChange={(event) =>
+                      setResourceForm({
+                        ...resourceForm,
+                        description: event.target.value,
+                      })
+                    }
+                    required
+                    rows={3}
+                    value={resourceForm.description}
+                  />
+                </label>
+                <div className="form-row">
+                  <label>
+                    Catégorie
+                    <select
+                      onChange={(event) =>
+                        setResourceForm({
+                          ...resourceForm,
+                          category: event.target.value,
+                        })
+                      }
+                      required
+                      value={resourceForm.category}
+                    >
+                      <option value="breakfast">Petit-déjeuner</option>
+                      <option value="lunch">Déjeuner</option>
+                      <option value="dinner">Dîner</option>
+                      <option value="snack">Collation</option>
+                    </select>
+                  </label>
+                  <label>
+                    Temps de préparation
+                    <input
+                      onChange={(event) =>
+                        setResourceForm({
+                          ...resourceForm,
+                          prep_time: event.target.value,
+                        })
+                      }
+                      placeholder="20 min"
+                      value={resourceForm.prep_time}
+                    />
+                  </label>
+                  <label>
+                    Difficulté
+                    <select
+                      onChange={(event) =>
+                        setResourceForm({
+                          ...resourceForm,
+                          difficulty: event.target.value,
+                        })
+                      }
+                      value={resourceForm.difficulty}
+                    >
+                      <option value="Facile">Facile</option>
+                      <option value="Intermédiaire">Intermédiaire</option>
+                    </select>
+                  </label>
+                </div>
+                <label>
+                  URL de l&apos;image
+                  <input
+                    onChange={(event) =>
+                      setResourceForm({
+                        ...resourceForm,
+                        image: event.target.value,
+                      })
+                    }
+                    placeholder="https://..."
+                    value={resourceForm.image}
+                  />
+                </label>
+                <label>
+                  Instructions ou lien
+                  <textarea
+                    onChange={(event) =>
+                      setResourceForm({
+                        ...resourceForm,
+                        content: event.target.value,
+                      })
+                    }
+                    rows={2}
+                    value={resourceForm.content}
+                  />
+                </label>
+              </>
+            ) : (
+              <label>
+                Lien ou texte
+                <textarea
+                  onChange={(event) =>
+                    setResourceForm({ ...resourceForm, content: event.target.value })
+                  }
+                  rows={2}
+                  value={resourceForm.content}
+                />
+              </label>
+            )}
             <label>
               Note
               <textarea
@@ -980,7 +1088,12 @@ export default function AdminPanel() {
               <div className="note-item" key={resource.id}>
                 <span>{resource.type}</span>
                 <p>{resource.title}</p>
-                {resource.content && <small>{resource.content}</small>}
+                {resource.type === 'recipe' && resource.category && (
+                  <small>{resource.category}</small>
+                )}
+                {(resource.description || resource.content) && (
+                  <small>{resource.description ?? resource.content}</small>
+                )}
                 <div className="item-actions">
                   <button
                     onClick={() =>

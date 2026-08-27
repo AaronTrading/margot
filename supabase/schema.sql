@@ -43,9 +43,21 @@ create table if not exists public.resources (
   type text not null default 'other' check (type in ('advice', 'recipe', 'shopping', 'other')),
   content text,
   note text,
+  description text,
+  category text check (category in ('breakfast', 'lunch', 'dinner', 'snack')),
+  prep_time text,
+  difficulty text check (difficulty in ('Facile', 'Intermédiaire')),
+  image text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.resources
+  add column if not exists description text,
+  add column if not exists category text check (category in ('breakfast', 'lunch', 'dinner', 'snack')),
+  add column if not exists prep_time text,
+  add column if not exists difficulty text check (difficulty in ('Facile', 'Intermédiaire')),
+  add column if not exists image text;
 
 create or replace function public.set_updated_at()
 returns trigger

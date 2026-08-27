@@ -3,9 +3,13 @@
 import { useMemo, useState } from 'react';
 import {
   recipeCategoryLabels,
-  recipes,
+  type Recipe,
   type RecipeCategory,
 } from '@/lib/recipes';
+
+type RecipesGridProps = {
+  recipes: Recipe[];
+};
 
 const filterOptions: Array<{ id: 'all' | RecipeCategory; label: string }> = [
   { id: 'all', label: 'Toutes' },
@@ -15,7 +19,7 @@ const filterOptions: Array<{ id: 'all' | RecipeCategory; label: string }> = [
   { id: 'snack', label: recipeCategoryLabels.snack },
 ];
 
-export function RecipesGrid() {
+export function RecipesGrid({ recipes }: RecipesGridProps) {
   const [activeFilter, setActiveFilter] = useState<'all' | RecipeCategory>('all');
 
   const filteredRecipes = useMemo(() => {
@@ -24,7 +28,7 @@ export function RecipesGrid() {
     }
 
     return recipes.filter((recipe) => recipe.category === activeFilter);
-  }, [activeFilter]);
+  }, [activeFilter, recipes]);
 
   return (
     <div className="recipes-layout">
@@ -51,27 +55,33 @@ export function RecipesGrid() {
         })}
       </div>
 
-      <div className="recipes-grid">
-        {filteredRecipes.map((recipe) => (
-          <article className="recipe-card" key={recipe.id}>
-            <div className="recipe-card-media">
-              <img src={recipe.image} alt={recipe.title} loading="lazy" />
-              <span className="recipe-card-badge">
-                {recipeCategoryLabels[recipe.category]}
-              </span>
-            </div>
-            <div className="recipe-card-body">
-              <h3>{recipe.title}</h3>
-              <p>{recipe.description}</p>
-              <div className="recipe-card-meta">
-                <span>{recipe.prepTime}</span>
-                <span aria-hidden="true">·</span>
-                <span>{recipe.difficulty}</span>
+      {filteredRecipes.length === 0 ? (
+        <p className="recipes-empty">
+          Aucune recette publiée pour le moment. Revenez bientôt.
+        </p>
+      ) : (
+        <div className="recipes-grid">
+          {filteredRecipes.map((recipe) => (
+            <article className="recipe-card" key={recipe.id}>
+              <div className="recipe-card-media">
+                <img src={recipe.image} alt={recipe.title} loading="lazy" />
+                <span className="recipe-card-badge">
+                  {recipeCategoryLabels[recipe.category]}
+                </span>
               </div>
-            </div>
-          </article>
-        ))}
-      </div>
+              <div className="recipe-card-body">
+                <h3>{recipe.title}</h3>
+                <p>{recipe.description}</p>
+                <div className="recipe-card-meta">
+                  <span>{recipe.prepTime}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{recipe.difficulty}</span>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

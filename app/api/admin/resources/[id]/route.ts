@@ -1,9 +1,6 @@
 import { requireAdmin } from '@/lib/adminAuth';
-import {
-  adminApiError,
-  getSupabaseAdmin,
-  normalizeEmpty,
-} from '@/lib/supabaseAdmin';
+import { resourcePayload } from '@/lib/resources';
+import { adminApiError, getSupabaseAdmin } from '@/lib/supabaseAdmin';
 
 export const runtime = 'nodejs';
 
@@ -12,15 +9,6 @@ type Context = {
     id: string;
   }>;
 };
-
-function resourcePayload(body: Record<string, unknown>) {
-  return {
-    content: normalizeEmpty(body.content),
-    note: normalizeEmpty(body.note),
-    title: normalizeEmpty(body.title),
-    type: normalizeEmpty(body.type) ?? 'other',
-  };
-}
 
 export async function PATCH(request: Request, context: Context) {
   try {
@@ -35,9 +23,18 @@ export async function PATCH(request: Request, context: Context) {
       string,
       unknown
     >;
+    const payload = resourcePayload(body);
+
+    if (payload.type === 'recipe' && !payload.category) {
+      return Response.json(
+        { error: 'La catégorie est requise pour une recette.' },
+        { status: 400 },
+      );
+    }
+
     const { data, error } = await getSupabaseAdmin()
       .from('resources')
-      .update(resourcePayload(body))
+      .update(payload)
       .eq('id', id)
       .select('*')
       .single();

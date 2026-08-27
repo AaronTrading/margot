@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { RecipesGrid } from '@/components/RecipesGrid';
 import { SiteHeader } from '@/components/SiteHeader';
+import { getRecipes } from '@/lib/recipes';
 import { doctolibUrl, externalLinkProps } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -9,7 +10,11 @@ export const metadata: Metadata = {
     'Des recettes simples, équilibrées et gourmandes pour composer vos repas au quotidien.',
 };
 
-export default function RecipesPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function RecipesPage() {
+  const recipes = await getRecipes();
+
   return (
     <main>
       <SiteHeader active="recettes" />
@@ -26,7 +31,7 @@ export default function RecipesPage() {
       </section>
 
       <section className="recipes-section">
-        <RecipesGrid />
+        <RecipesGrid recipes={recipes} />
       </section>
 
       <section className="final-cta">
