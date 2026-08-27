@@ -57,6 +57,16 @@ type Resource = {
   updated_at: string;
 };
 
+type DiagnosticResult = {
+  ok: boolean;
+  supabaseHost: string;
+  tables: {
+    error: string | null;
+    ok: boolean;
+    table: string;
+  }[];
+};
+
 const emptyClient = {
   allergies: '',
   email: '',
@@ -144,6 +154,7 @@ export default function AdminPanel() {
   const [editingResourceId, setEditingResourceId] = useState('');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [diagnostics, setDiagnostics] = useState<DiagnosticResult | null>(null);
 
   const selectedClient = clients.find((client) => client.id === selectedClientId);
   const activeReminders = reminders.filter((reminder) => reminder.status === 'todo');
@@ -170,18 +181,44 @@ export default function AdminPanel() {
   }, [clients, search, statusFilter]);
 
   async function loadAll() {
-    const [clientsData, remindersData, resourcesData] = await Promise.all([
+    const [clientsData, remindersData, resourcesData] = await Promise.allSettled([
       requestJson<{ clients: Client[] }>('/api/admin/clients'),
       requestJson<{ reminders: Reminder[] }>('/api/admin/reminders'),
       requestJson<{ resources: Resource[] }>('/api/admin/resources'),
     ]);
 
-    setClients(clientsData.clients);
-    setReminders(remindersData.reminders);
-    setResources(resourcesData.resources);
+    const firstError = [clientsData, remindersData, resourcesData].find(
+      (result) => result.status === 'rejected',
+    );
 
-    if (!selectedClientId && clientsData.clients[0]) {
-      setSelectedClientId(clientsData.clients[0].id);
+    if (firstError?.status === 'rejected') {
+      setError(firstError.reason.message);
+      return;
+    }
+
+    if (
+      clientsData.status === 'fulfilled' &&
+      remindersData.status === 'fulfilled' &&
+      resourcesData.status === 'fulfilled'
+    ) {
+      setClients(clientsData.value.clients);
+      setReminders(remindersData.value.reminders);
+      setResources(resourcesData.value.resources);
+
+      if (!selectedClientId && clientsData.value.clients[0]) {
+        setSelectedClientId(clientsData.value.clients[0].id);
+      }
+    }
+  }
+
+  async function runDiagnostics() {
+    setError('');
+
+    try {
+      const data = await requestJson<DiagnosticResult>('/api/admin/diagnostics');
+      setDiagnostics(data);
+    } catch (requestError) {
+      setError((requestError as Error).message);
     }
   }
 
@@ -438,7 +475,32 @@ export default function AdminPanel() {
         </button>
       </header>
 
-      {error && <p className="admin-error">{error}</p>}
+      {error && (
+        <div className="admin-error">
+          <p>{error}</p>
+          <button className="text-button" onClick={runDiagnostics} type="button">
+            Diagnostiquer Supabase
+          </button>
+        </div>
+      )}
+
+      {diagnostics && (
+        <section className="diagnostic-card">
+          <div>
+            <p className="admin-eyebrow">Diagnostic Supabase</p>
+            <h2>{diagnostics.ok ? 'Connexion valide' : 'Action requise'}</h2>
+            <p>Projet détecté : {diagnostics.supabaseHost}</p>
+          </div>
+          <div className="diagnostic-list">
+            {diagnostics.tables.map((table) => (
+              <p key={table.table}>
+                <strong>{table.table}</strong>
+                <span>{table.ok ? 'OK' : table.error}</span>
+              </p>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="admin-stats" aria-label="Tableau de bord">
         <article>

@@ -194,14 +194,60 @@
   color: var(--brown);
 }
 
-.admin-error {
+.admin-error,
+.diagnostic-card {
   background: rgba(180, 151, 134, 0.16);
   border: 1px solid rgba(180, 151, 134, 0.34);
   border-radius: 18px;
   color: var(--brown);
+  display: grid;
+  gap: 12px;
   margin: 0 auto 14px;
   max-width: 1180px;
   padding: 12px 14px;
+}
+
+.admin-error p,
+.diagnostic-card p {
+  margin: 0;
+}
+
+.diagnostic-card {
+  background: rgba(255, 253, 251, 0.82);
+  border-radius: 28px;
+  margin-bottom: 18px;
+  padding: 18px;
+}
+
+.diagnostic-card h2 {
+  color: var(--brown);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.65rem, 7vw, 2.6rem);
+  font-weight: 500;
+  line-height: 1.04;
+  margin: 0 0 10px;
+}
+
+.diagnostic-list {
+  display: grid;
+  gap: 8px;
+}
+
+.diagnostic-list p {
+  background: rgba(237, 232, 228, 0.46);
+  border-radius: 16px;
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+}
+
+.diagnostic-list strong {
+  color: var(--brown);
+}
+
+.diagnostic-list span {
+  color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
 .filters {
@@ -291,6 +337,10 @@
 
   .admin-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .diagnostic-card {
+    grid-template-columns: minmax(220px, 0.6fr) minmax(0, 1fr);
   }
 
   .wide-card {

@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-export function getSupabaseAdmin() {
+export function getSupabaseConfig() {
   const url = (
     process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL
   )?.trim();
@@ -12,13 +12,30 @@ export function getSupabaseAdmin() {
     );
   }
 
+  let parsedUrl: URL;
+
   try {
-    new URL(url);
+    parsedUrl = new URL(url);
   } catch {
     throw new Error(
       'URL Supabase invalide. Elle doit ressembler à https://xxxx.supabase.co',
     );
   }
+
+  if (!parsedUrl.hostname.endsWith('.supabase.co')) {
+    throw new Error(
+      'URL Supabase suspecte. Utilise bien la Project URL Supabase au format https://xxxx.supabase.co',
+    );
+  }
+
+  return {
+    serviceRoleKey,
+    url,
+  };
+}
+
+export function getSupabaseAdmin() {
+  const { serviceRoleKey, url } = getSupabaseConfig();
 
   return createClient(url, serviceRoleKey, {
     auth: {
@@ -31,6 +48,8 @@ export function getSupabaseAdmin() {
 export function adminApiError(error: unknown) {
   const message =
     error instanceof Error ? error.message : 'Une erreur serveur est survenue.';
+
+  console.error('[admin-api]', message, error);
 
   if (message === 'fetch failed') {
     return Response.json(
