@@ -1,0 +1,64 @@
+import { requireAdmin } from '@/lib/adminAuth';
+import { getSupabaseAdmin, normalizeEmpty } from '@/lib/supabaseAdmin';
+
+type Context = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+function reminderPayload(body: Record<string, unknown>) {
+  return {
+    client_id: normalizeEmpty(body.client_id),
+    due_date: normalizeEmpty(body.due_date),
+    note: normalizeEmpty(body.note),
+    status: normalizeEmpty(body.status) ?? 'todo',
+    title: normalizeEmpty(body.title),
+  };
+}
+
+export async function PATCH(request: Request, context: Context) {
+  const unauthorized = await requireAdmin();
+
+  if (unauthorized) {
+    return unauthorized;
+  }
+
+  const { id } = await context.params;
+  const body = (await request.json().catch(() => ({}))) as Record<
+    string,
+    unknown
+  >;
+  const { data, error } = await getSupabaseAdmin()
+    .from('reminders')
+    .update(reminderPayload(body))
+    .eq('id', id)
+    .select('*, clients(first_name,last_name)')
+    .single();
+
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+
+  return Response.json({ reminder: data });
+}
+
+export async function DELETE(_request: Request, context: Context) {
+  const unauthorized = await requireAdmin();
+
+  if (unauthorized) {
+    return unauthorized;
+  }
+
+  const { id } = await context.params;
+  const { error } = await getSupabaseAdmin()
+    .from('reminders')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+
+  return Response.json({ ok: true });
+}
