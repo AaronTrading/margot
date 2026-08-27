@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import {
   recipeCategoryLabels,
@@ -13,10 +14,10 @@ type RecipesGridProps = {
 
 const filterOptions: Array<{ id: 'all' | RecipeCategory; label: string }> = [
   { id: 'all', label: 'Toutes' },
-  { id: 'breakfast', label: recipeCategoryLabels.breakfast },
-  { id: 'lunch', label: recipeCategoryLabels.lunch },
-  { id: 'dinner', label: recipeCategoryLabels.dinner },
-  { id: 'snack', label: recipeCategoryLabels.snack },
+  { id: 'petit-dejeuner', label: recipeCategoryLabels['petit-dejeuner'] },
+  { id: 'dejeuner', label: recipeCategoryLabels.dejeuner },
+  { id: 'diner', label: recipeCategoryLabels.diner },
+  { id: 'collation', label: recipeCategoryLabels.collation },
 ];
 
 export function RecipesGrid({ recipes }: RecipesGridProps) {
@@ -62,7 +63,11 @@ export function RecipesGrid({ recipes }: RecipesGridProps) {
       ) : (
         <div className="recipes-grid">
           {filteredRecipes.map((recipe) => (
-            <article className="recipe-card" key={recipe.id}>
+            <Link
+              className="recipe-card"
+              href={`/recettes/${recipe.id}`}
+              key={recipe.id}
+            >
               <div className="recipe-card-media">
                 <img src={recipe.image} alt={recipe.title} loading="lazy" />
                 <span className="recipe-card-badge">
@@ -78,7 +83,7 @@ export function RecipesGrid({ recipes }: RecipesGridProps) {
                   <span>{recipe.difficulty}</span>
                 </div>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       )}

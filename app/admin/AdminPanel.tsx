@@ -1,6 +1,12 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import {
+  getRecipeCategoryLabel,
+  recipeCategoryLabels,
+  resourceTypeLabels,
+  type RecipeCategory,
+} from '@/lib/resources';
 
 type ClientStatus = 'active' | 'paused' | 'done';
 type ReminderStatus = 'todo' | 'done';
@@ -95,7 +101,7 @@ const emptyReminder = {
 };
 
 const emptyResource = {
-  category: 'breakfast',
+  category: 'petit-dejeuner' as RecipeCategory,
   content: '',
   description: '',
   difficulty: 'Facile',
@@ -414,7 +420,7 @@ export default function AdminPanel() {
   function editResource(resource: Resource) {
     setEditingResourceId(resource.id);
     setResourceForm({
-      category: resource.category ?? 'breakfast',
+      category: (resource.category as RecipeCategory) ?? 'petit-dejeuner',
       content: resource.content ?? '',
       description: resource.description ?? '',
       difficulty: resource.difficulty ?? 'Facile',
@@ -995,10 +1001,10 @@ export default function AdminPanel() {
                       required
                       value={resourceForm.category}
                     >
-                      <option value="breakfast">Petit-déjeuner</option>
-                      <option value="lunch">Déjeuner</option>
-                      <option value="dinner">Dîner</option>
-                      <option value="snack">Collation</option>
+                      <option value="petit-dejeuner">Petit-déjeuner</option>
+                      <option value="dejeuner">Déjeuner</option>
+                      <option value="diner">Dîner</option>
+                      <option value="collation">Collation</option>
                     </select>
                   </label>
                   <label>
@@ -1027,6 +1033,7 @@ export default function AdminPanel() {
                     >
                       <option value="Facile">Facile</option>
                       <option value="Intermédiaire">Intermédiaire</option>
+                      <option value="Difficile">Difficile</option>
                     </select>
                   </label>
                 </div>
@@ -1086,10 +1093,10 @@ export default function AdminPanel() {
           <div className="list-stack">
             {resources.map((resource) => (
               <div className="note-item" key={resource.id}>
-                <span>{resource.type}</span>
+                <span>{resourceTypeLabels[resource.type]}</span>
                 <p>{resource.title}</p>
                 {resource.type === 'recipe' && resource.category && (
-                  <small>{resource.category}</small>
+                  <small>{getRecipeCategoryLabel(resource.category)}</small>
                 )}
                 {(resource.description || resource.content) && (
                   <small>{resource.description ?? resource.content}</small>

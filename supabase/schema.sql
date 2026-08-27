@@ -44,9 +44,9 @@ create table if not exists public.resources (
   content text,
   note text,
   description text,
-  category text check (category in ('breakfast', 'lunch', 'dinner', 'snack')),
+  category text check (category in ('petit-dejeuner', 'dejeuner', 'diner', 'collation')),
   prep_time text,
-  difficulty text check (difficulty in ('Facile', 'Intermédiaire')),
+  difficulty text check (difficulty in ('Facile', 'Intermédiaire', 'Difficile')),
   image text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -54,10 +54,36 @@ create table if not exists public.resources (
 
 alter table public.resources
   add column if not exists description text,
-  add column if not exists category text check (category in ('breakfast', 'lunch', 'dinner', 'snack')),
+  add column if not exists category text,
   add column if not exists prep_time text,
-  add column if not exists difficulty text check (difficulty in ('Facile', 'Intermédiaire')),
+  add column if not exists difficulty text,
   add column if not exists image text;
+
+update public.resources
+set category = 'petit-dejeuner'
+where category = 'breakfast';
+
+update public.resources
+set category = 'dejeuner'
+where category = 'lunch';
+
+update public.resources
+set category = 'diner'
+where category = 'dinner';
+
+update public.resources
+set category = 'collation'
+where category = 'snack';
+
+alter table public.resources drop constraint if exists resources_category_check;
+alter table public.resources
+  add constraint resources_category_check
+  check (category in ('petit-dejeuner', 'dejeuner', 'diner', 'collation'));
+
+alter table public.resources drop constraint if exists resources_difficulty_check;
+alter table public.resources
+  add constraint resources_difficulty_check
+  check (difficulty in ('Facile', 'Intermédiaire', 'Difficile'));
 
 create or replace function public.set_updated_at()
 returns trigger
