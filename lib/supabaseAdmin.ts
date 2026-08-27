@@ -29,9 +29,15 @@ export function getSupabaseConfig() {
     );
   }
 
-  if (!parsedUrl.hostname.endsWith('.supabase.co')) {
+  const hostnameParts = parsedUrl.hostname.split('.');
+
+  if (
+    hostnameParts.length !== 3 ||
+    hostnameParts[1] !== 'supabase' ||
+    hostnameParts[2] !== 'co'
+  ) {
     throw new Error(
-      'URL Supabase suspecte. Utilise bien la Project URL Supabase au format https://xxxx.supabase.co',
+      `URL Supabase incorrecte (${parsedUrl.hostname}). Utilise la Project URL Supabase exacte, au format https://xxxx.supabase.co, et pas l’URL Vercel du site.`,
     );
   }
 
