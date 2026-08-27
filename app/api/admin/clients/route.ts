@@ -6,6 +6,8 @@ import {
   normalizeNumber,
 } from '@/lib/supabaseAdmin';
 
+export const runtime = 'nodejs';
+
 function clientPayload(body: Record<string, unknown>) {
   return {
     allergies: normalizeEmpty(body.allergies),

@@ -3,19 +3,30 @@ import {
   isAdminAuthenticated,
   requireAdmin,
 } from '@/lib/adminAuth';
+import { adminApiError } from '@/lib/supabaseAdmin';
+
+export const runtime = 'nodejs';
 
 export async function GET() {
-  return Response.json({ authenticated: await isAdminAuthenticated() });
+  try {
+    return Response.json({ authenticated: await isAdminAuthenticated() });
+  } catch (error) {
+    return adminApiError(error);
+  }
 }
 
 export async function DELETE() {
-  const unauthorized = await requireAdmin();
+  try {
+    const unauthorized = await requireAdmin();
 
-  if (unauthorized) {
-    return unauthorized;
+    if (unauthorized) {
+      return unauthorized;
+    }
+
+    await clearAdminCookie();
+
+    return Response.json({ authenticated: false });
+  } catch (error) {
+    return adminApiError(error);
   }
-
-  await clearAdminCookie();
-
-  return Response.json({ authenticated: false });
 }

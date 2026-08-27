@@ -42,6 +42,29 @@ export function getSupabaseAdmin() {
       autoRefreshToken: false,
       persistSession: false,
     },
+    global: {
+      fetch: async (input, init) => {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
+
+        try {
+          return await fetch(input, {
+            ...init,
+            signal: controller.signal,
+          });
+        } catch (error) {
+          if (error instanceof Error && error.name === 'AbortError') {
+            throw new Error(
+              'Supabase ne répond pas dans le délai prévu. Vérifie que le projet Supabase est actif et que l’URL pointe vers le bon projet.',
+            );
+          }
+
+          throw error;
+        } finally {
+          clearTimeout(timeout);
+        }
+      },
+    },
   });
 }
 

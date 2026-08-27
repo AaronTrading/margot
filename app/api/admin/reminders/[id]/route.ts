@@ -5,6 +5,8 @@ import {
   normalizeEmpty,
 } from '@/lib/supabaseAdmin';
 
+export const runtime = 'nodejs';
+
 type Context = {
   params: Promise<{
     id: string;

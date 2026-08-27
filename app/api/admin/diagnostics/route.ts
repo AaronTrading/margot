@@ -5,6 +5,8 @@ import {
   getSupabaseConfig,
 } from '@/lib/supabaseAdmin';
 
+export const runtime = 'nodejs';
+
 const tables = ['clients', 'client_notes', 'reminders', 'resources'] as const;
 
 export async function GET() {

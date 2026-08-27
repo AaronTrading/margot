@@ -5,6 +5,8 @@ import {
   normalizeEmpty,
 } from '@/lib/supabaseAdmin';
 
+export const runtime = 'nodejs';
+
 function resourcePayload(body: Record<string, unknown>) {
   return {
     content: normalizeEmpty(body.content),

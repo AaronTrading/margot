@@ -116,13 +116,22 @@ async function requestJson<T>(
   url: string,
   options?: RequestInit,
 ): Promise<T> {
-  const response = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options?.headers ?? {}),
-    },
-    ...options,
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options?.headers ?? {}),
+      },
+      ...options,
+    });
+  } catch {
+    throw new Error(
+      'La requête admin a été interrompue avant réponse. Vérifie le dernier déploiement Vercel et relance après quelques secondes.',
+    );
+  }
+
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {

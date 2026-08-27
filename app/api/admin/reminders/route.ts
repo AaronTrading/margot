@@ -5,6 +5,8 @@ import {
   normalizeEmpty,
 } from '@/lib/supabaseAdmin';
 
+export const runtime = 'nodejs';
+
 function reminderPayload(body: Record<string, unknown>) {
   return {
     client_id: normalizeEmpty(body.client_id),
