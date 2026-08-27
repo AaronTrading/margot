@@ -1,5 +1,9 @@
 import { requireAdmin } from '@/lib/adminAuth';
-import { getSupabaseAdmin, normalizeEmpty } from '@/lib/supabaseAdmin';
+import {
+  adminApiError,
+  getSupabaseAdmin,
+  normalizeEmpty,
+} from '@/lib/supabaseAdmin';
 
 function resourcePayload(body: Record<string, unknown>) {
   return {
@@ -11,50 +15,58 @@ function resourcePayload(body: Record<string, unknown>) {
 }
 
 export async function GET() {
-  const unauthorized = await requireAdmin();
+  try {
+    const unauthorized = await requireAdmin();
 
-  if (unauthorized) {
-    return unauthorized;
+    if (unauthorized) {
+      return unauthorized;
+    }
+
+    const { data, error } = await getSupabaseAdmin()
+      .from('resources')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 });
+    }
+
+    return Response.json({ resources: data ?? [] });
+  } catch (error) {
+    return adminApiError(error);
   }
-
-  const { data, error } = await getSupabaseAdmin()
-    .from('resources')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
-  }
-
-  return Response.json({ resources: data ?? [] });
 }
 
 export async function POST(request: Request) {
-  const unauthorized = await requireAdmin();
+  try {
+    const unauthorized = await requireAdmin();
 
-  if (unauthorized) {
-    return unauthorized;
+    if (unauthorized) {
+      return unauthorized;
+    }
+
+    const body = (await request.json().catch(() => ({}))) as Record<
+      string,
+      unknown
+    >;
+    const payload = resourcePayload(body);
+
+    if (!payload.title) {
+      return Response.json({ error: 'Le titre est requis.' }, { status: 400 });
+    }
+
+    const { data, error } = await getSupabaseAdmin()
+      .from('resources')
+      .insert(payload)
+      .select('*')
+      .single();
+
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 });
+    }
+
+    return Response.json({ resource: data });
+  } catch (error) {
+    return adminApiError(error);
   }
-
-  const body = (await request.json().catch(() => ({}))) as Record<
-    string,
-    unknown
-  >;
-  const payload = resourcePayload(body);
-
-  if (!payload.title) {
-    return Response.json({ error: 'Le titre est requis.' }, { status: 400 });
-  }
-
-  const { data, error } = await getSupabaseAdmin()
-    .from('resources')
-    .insert(payload)
-    .select('*')
-    .single();
-
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
-  }
-
-  return Response.json({ resource: data });
 }

@@ -1,5 +1,6 @@
 import { requireAdmin } from '@/lib/adminAuth';
 import {
+  adminApiError,
   getSupabaseAdmin,
   normalizeEmpty,
   normalizeNumber,
@@ -28,47 +29,55 @@ function clientPayload(body: Record<string, unknown>) {
 }
 
 export async function PATCH(request: Request, context: Context) {
-  const unauthorized = await requireAdmin();
+  try {
+    const unauthorized = await requireAdmin();
 
-  if (unauthorized) {
-    return unauthorized;
+    if (unauthorized) {
+      return unauthorized;
+    }
+
+    const { id } = await context.params;
+    const body = (await request.json().catch(() => ({}))) as Record<
+      string,
+      unknown
+    >;
+    const { data, error } = await getSupabaseAdmin()
+      .from('clients')
+      .update(clientPayload(body))
+      .eq('id', id)
+      .select('*')
+      .single();
+
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 });
+    }
+
+    return Response.json({ client: data });
+  } catch (error) {
+    return adminApiError(error);
   }
-
-  const { id } = await context.params;
-  const body = (await request.json().catch(() => ({}))) as Record<
-    string,
-    unknown
-  >;
-  const { data, error } = await getSupabaseAdmin()
-    .from('clients')
-    .update(clientPayload(body))
-    .eq('id', id)
-    .select('*')
-    .single();
-
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
-  }
-
-  return Response.json({ client: data });
 }
 
 export async function DELETE(_request: Request, context: Context) {
-  const unauthorized = await requireAdmin();
+  try {
+    const unauthorized = await requireAdmin();
 
-  if (unauthorized) {
-    return unauthorized;
+    if (unauthorized) {
+      return unauthorized;
+    }
+
+    const { id } = await context.params;
+    const { error } = await getSupabaseAdmin()
+      .from('clients')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 });
+    }
+
+    return Response.json({ ok: true });
+  } catch (error) {
+    return adminApiError(error);
   }
-
-  const { id } = await context.params;
-  const { error } = await getSupabaseAdmin()
-    .from('clients')
-    .delete()
-    .eq('id', id);
-
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
-  }
-
-  return Response.json({ ok: true });
 }
