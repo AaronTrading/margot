@@ -3,6 +3,10 @@ const doctolibUrl =
 const instagramUrl = 'https://www.instagram.com/margot.diet/';
 const mapEmbedUrl =
   'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2885.217845980032!2d1.4049594770763894!3d43.68523427110062!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12aea5f736113023%3A0x91f26609acdeeba1!2sAtlani%20Margot%20-%20Di%C3%A9t%C3%A9ticienne!5e0!3m2!1sfr!2sfr!4v1787851319185!5m2!1sfr!2sfr';
+const externalLinkProps = {
+  rel: 'noreferrer',
+  target: '_blank',
+};
 
 const supportAreas = [
   'Rééquilibrage alimentaire',
@@ -40,7 +44,7 @@ export default function Home() {
           <a href="#consultations">Consultations</a>
           <a href="#cabinet">Cabinet</a>
         </nav>
-        <a className="header-action" href={doctolibUrl}>
+        <a className="header-action" href={doctolibUrl} {...externalLinkProps}>
           RDV
         </a>
       </header>
@@ -55,7 +59,7 @@ export default function Home() {
             culpabilisant.
           </p>
           <div className="hero-actions" aria-label="Actions principales">
-            <a className="primary-button" href={doctolibUrl}>
+            <a className="primary-button" href={doctolibUrl} {...externalLinkProps}>
               Prendre rendez-vous
             </a>
             <a className="secondary-button" href="tel:+33777203145">
@@ -152,7 +156,9 @@ export default function Home() {
             <p>
               <a href="tel:+33777203145">07 77 20 31 45</a>
               <br />
-              <a href={instagramUrl}>@margot.diet</a>
+              <a href={instagramUrl} {...externalLinkProps}>
+                @margot.diet
+              </a>
             </p>
             <p className="muted">Rendez-vous en ligne via Doctolib.</p>
           </article>
@@ -195,10 +201,10 @@ export default function Home() {
         <p className="eyebrow">Prendre soin de son alimentation</p>
         <h2>Commencer par un rendez-vous, simplement.</h2>
         <div className="hero-actions">
-          <a className="primary-button" href={doctolibUrl}>
+          <a className="primary-button" href={doctolibUrl} {...externalLinkProps}>
             Réserver sur Doctolib
           </a>
-          <a className="secondary-button" href={instagramUrl}>
+          <a className="secondary-button" href={instagramUrl} {...externalLinkProps}>
             Voir Instagram
           </a>
         </div>
