@@ -64,26 +64,28 @@ main {
 }
 
 .brand {
-  display: grid;
-  gap: 3px;
+  align-items: center;
+  display: inline-flex;
+  height: 48px;
+  justify-self: start;
   line-height: 1;
 }
 
-.brand span {
-  color: var(--caramel);
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 1.1rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.brand-logo {
+  height: 44px;
+  object-fit: contain;
+  object-position: left center;
+  width: 132px;
 }
 
-.brand small {
-  color: var(--brown);
-  font-size: 0.68rem;
-  font-weight: 400;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+.sr-only {
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
 .site-header nav {
@@ -463,6 +465,15 @@ h3 {
   .site-header {
     grid-template-columns: 1fr auto auto;
     padding: 18px 34px;
+  }
+
+  .brand {
+    height: 56px;
+  }
+
+  .brand-logo {
+    height: 52px;
+    width: 168px;
   }
 
   .site-header nav {

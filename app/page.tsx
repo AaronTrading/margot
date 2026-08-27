@@ -27,8 +27,13 @@ export default function Home() {
     <main>
       <header className="site-header">
         <a className="brand" href="#accueil" aria-label="Accueil Margot Atlani">
-          <span>Margot Atlani</span>
-          <small>Diététicienne</small>
+          <img
+            className="brand-logo"
+            src="/logo.png"
+            alt=""
+            aria-hidden="true"
+          />
+          <span className="sr-only">Margot Atlani, diététicienne</span>
         </a>
         <nav aria-label="Navigation principale">
           <a href="#approche">Approche</a>
