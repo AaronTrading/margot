@@ -68,10 +68,10 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="hero-visual" aria-label="Ambiance nutrition">
+        <div className="hero-visual" aria-label="Portrait de Margot Atlani">
           <img
-            src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1200&q=82"
-            alt="Assiette colorée et aliments frais sur une table"
+            src="/photomargot.png"
+            alt="Margot Atlani, diététicienne à Saint-Alban"
           />
           <div className="consult-note">
             <strong>Consultations au cabinet</strong>
