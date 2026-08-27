@@ -3,6 +3,7 @@ import {
   adminApiError,
   getSupabaseAdmin,
   normalizeEmpty,
+  supabaseErrorResponse,
 } from '@/lib/supabaseAdmin';
 
 export const runtime = 'nodejs';
@@ -30,7 +31,7 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return Response.json({ error: error.message }, { status: 500 });
+      return supabaseErrorResponse(error, 'chargement des ressources');
     }
 
     return Response.json({ resources: data ?? [] });
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      return Response.json({ error: error.message }, { status: 500 });
+      return supabaseErrorResponse(error, 'création de la ressource');
     }
 
     return Response.json({ resource: data });

@@ -40,7 +40,7 @@ export async function PATCH(request: Request, context: Context) {
       .from('reminders')
       .update(reminderPayload(body))
       .eq('id', id)
-      .select('*, clients(first_name,last_name)')
+      .select('*')
       .single();
 
     if (error) {

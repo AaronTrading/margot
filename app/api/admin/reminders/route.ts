@@ -3,6 +3,7 @@ import {
   adminApiError,
   getSupabaseAdmin,
   normalizeEmpty,
+  supabaseErrorResponse,
 } from '@/lib/supabaseAdmin';
 
 export const runtime = 'nodejs';
@@ -27,13 +28,13 @@ export async function GET() {
 
     const { data, error } = await getSupabaseAdmin()
       .from('reminders')
-      .select('*, clients(first_name,last_name)')
+      .select('*')
       .order('status', { ascending: false })
       .order('due_date', { ascending: true, nullsFirst: false })
       .order('created_at', { ascending: false });
 
     if (error) {
-      return Response.json({ error: error.message }, { status: 500 });
+      return supabaseErrorResponse(error, 'chargement des rappels');
     }
 
     return Response.json({ reminders: data ?? [] });
@@ -63,11 +64,11 @@ export async function POST(request: Request) {
     const { data, error } = await getSupabaseAdmin()
       .from('reminders')
       .insert(payload)
-      .select('*, clients(first_name,last_name)')
+      .select('*')
       .single();
 
     if (error) {
-      return Response.json({ error: error.message }, { status: 500 });
+      return supabaseErrorResponse(error, 'création du rappel');
     }
 
     return Response.json({ reminder: data });

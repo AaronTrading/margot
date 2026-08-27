@@ -4,6 +4,7 @@ import {
   getSupabaseAdmin,
   normalizeEmpty,
   normalizeNumber,
+  supabaseErrorResponse,
 } from '@/lib/supabaseAdmin';
 
 export const runtime = 'nodejs';
@@ -54,7 +55,7 @@ export async function GET(request: Request) {
     const { data, error } = await requestBuilder;
 
     if (error) {
-      return Response.json({ error: error.message }, { status: 500 });
+      return supabaseErrorResponse(error, 'chargement des clients');
     }
 
     return Response.json({ clients: data ?? [] });
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      return Response.json({ error: error.message }, { status: 500 });
+      return supabaseErrorResponse(error, 'création du client');
     }
 
     return Response.json({ client: data });

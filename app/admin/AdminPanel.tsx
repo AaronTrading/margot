@@ -883,10 +883,12 @@ export default function AdminPanel() {
                 <div className="list-main as-text">
                   <strong>{reminder.title}</strong>
                   <span>
-                    {reminder.clients
-                      ? [reminder.clients.first_name, reminder.clients.last_name]
-                          .filter(Boolean)
-                          .join(' ')
+                    {reminder.client_id
+                      ? clientName(
+                          clients.find(
+                            (client) => client.id === reminder.client_id,
+                          ),
+                        )
                       : 'Sans client'}{' '}
                     · {formatDate(reminder.due_date)}
                   </span>

@@ -1,5 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
+type SupabaseLikeError = {
+  code?: string;
+  details?: string;
+  hint?: string;
+  message?: string;
+};
+
 export function getSupabaseConfig() {
   const url = (
     process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -85,6 +92,37 @@ export function adminApiError(error: unknown) {
   }
 
   return Response.json({ error: message }, { status: 500 });
+}
+
+export function supabaseErrorResponse(
+  error: SupabaseLikeError,
+  context: string,
+) {
+  const parts = [
+    error.message,
+    error.code ? `code: ${error.code}` : null,
+    error.details ? `details: ${error.details}` : null,
+    error.hint ? `hint: ${error.hint}` : null,
+  ].filter(Boolean);
+
+  console.error(`[supabase:${context}]`, error);
+
+  return Response.json(
+    {
+      error: parts.join(' — ') || `Erreur Supabase pendant ${context}.`,
+    },
+    { status: 500 },
+  );
+}
+
+export function mapSupabaseCheckError(error: SupabaseLikeError | null) {
+  if (!error) {
+    return null;
+  }
+
+  return [error.message, error.code, error.details, error.hint]
+    .filter(Boolean)
+    .join(' — ');
 }
 
 export function normalizeEmpty(value: unknown) {
