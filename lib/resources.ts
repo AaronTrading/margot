@@ -59,6 +59,20 @@ const legacyCategoryMap: Record<string, RecipeCategory> = {
   collation: 'collation',
 };
 
+const legacyDifficultyMap: Record<string, RecipeDifficulty> = {
+  easy: 'Facile',
+  facile: 'Facile',
+  Facile: 'Facile',
+  medium: 'Intermédiaire',
+  intermediate: 'Intermédiaire',
+  intermediaire: 'Intermédiaire',
+  'intermédiaire': 'Intermédiaire',
+  Intermédiaire: 'Intermédiaire',
+  hard: 'Difficile',
+  difficile: 'Difficile',
+  Difficile: 'Difficile',
+};
+
 export const DEFAULT_RECIPE_IMAGE =
   'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=82';
 
@@ -76,17 +90,62 @@ export function getRecipeCategoryLabel(category: string | null | undefined) {
   return recipeCategoryLabels[normalizeRecipeCategory(category)];
 }
 
+export function normalizeRecipeDifficulty(
+  difficulty: string | null | undefined,
+): RecipeDifficulty {
+  if (!difficulty) {
+    return 'Facile';
+  }
+
+  return legacyDifficultyMap[difficulty] ?? 'Facile';
+}
+
+export function getRecipeDifficultyLabel(
+  difficulty: string | null | undefined,
+) {
+  return normalizeRecipeDifficulty(difficulty);
+}
+
+function normalizeText(value: unknown) {
+  const normalized = normalizeEmpty(value);
+
+  return typeof normalized === 'string' ? normalized : null;
+}
+
+function normalizeResourceType(value: unknown): ResourceType {
+  const type = normalizeText(value);
+
+  if (
+    type === 'advice' ||
+    type === 'recipe' ||
+    type === 'shopping' ||
+    type === 'other'
+  ) {
+    return type;
+  }
+
+  return 'other';
+}
+
 export function resourcePayload(body: Record<string, unknown>) {
+  const type = normalizeResourceType(body.type);
+
   return {
-    category: normalizeEmpty(body.category),
-    content: normalizeEmpty(body.content),
-    description: normalizeEmpty(body.description),
-    difficulty: normalizeEmpty(body.difficulty),
-    image: normalizeEmpty(body.image),
-    note: normalizeEmpty(body.note),
-    prep_time: normalizeEmpty(body.prep_time),
-    title: normalizeEmpty(body.title),
-    type: normalizeEmpty(body.type) ?? 'other',
+    category:
+      type === 'recipe'
+        ? normalizeRecipeCategory(normalizeText(body.category))
+        : null,
+    content: normalizeText(body.content),
+    description: type === 'recipe' ? normalizeText(body.description) : null,
+    difficulty:
+      type === 'recipe'
+        ? normalizeRecipeDifficulty(normalizeText(body.difficulty))
+        : null,
+    image: type === 'recipe' ? normalizeText(body.image) : null,
+    note: normalizeText(body.note),
+    prep_time: type === 'recipe' ? normalizeText(body.prep_time) : null,
+    title: normalizeText(body.title),
+    type,
   };
 }
 
@@ -98,7 +157,7 @@ export function mapResourceToRecipe(resource: RecipeResourceRow): Recipe {
     instructions: resource.content?.trim() || '',
     category: normalizeRecipeCategory(resource.category),
     prepTime: resource.prep_time?.trim() || '—',
-    difficulty: resource.difficulty ?? 'Facile',
+    difficulty: normalizeRecipeDifficulty(resource.difficulty),
     image: resource.image?.trim() || DEFAULT_RECIPE_IMAGE,
   };
 }

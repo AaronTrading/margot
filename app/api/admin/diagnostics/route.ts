@@ -12,7 +12,7 @@ const checks = [
   {
     name: 'clients',
     select:
-      'id,first_name,last_name,phone,email,goals,status,short_note,weight_kg,height_cm,allergies,intolerances,created_at,updated_at',
+      'id,first_name,last_name,phone,email,goals,status,short_note,weight_kg,height_cm,allergies,intolerances,report,created_at,updated_at',
     table: 'clients',
   },
   {
@@ -27,7 +27,8 @@ const checks = [
   },
   {
     name: 'resources',
-    select: 'id,title,type,content,note,created_at,updated_at',
+    select:
+      'id,title,type,content,note,description,category,prep_time,difficulty,image,created_at,updated_at',
     table: 'resources',
   },
   {

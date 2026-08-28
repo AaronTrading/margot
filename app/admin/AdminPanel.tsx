@@ -1,8 +1,10 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import {
   getRecipeCategoryLabel,
+  getRecipeDifficultyLabel,
+  normalizeRecipeDifficulty,
   recipeCategoryLabels,
   resourceTypeLabels,
   type RecipeCategory,
@@ -23,6 +25,7 @@ type Client = {
   intolerances: string | null;
   last_name: string | null;
   phone: string | null;
+  report: string | null;
   short_note: string | null;
   status: ClientStatus;
   updated_at: string;
@@ -180,8 +183,16 @@ export default function AdminPanel() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [diagnostics, setDiagnostics] = useState<DiagnosticResult | null>(null);
+  const [reportClientId, setReportClientId] = useState('');
+  const [reportDraft, setReportDraft] = useState('');
+  const [reportSaveState, setReportSaveState] = useState<
+    'idle' | 'saving' | 'saved' | 'error'
+  >('idle');
+  const [reportCopied, setReportCopied] = useState(false);
+  const lastSavedReport = useRef('');
 
   const selectedClient = clients.find((client) => client.id === selectedClientId);
+  const reportClient = clients.find((client) => client.id === reportClientId);
   const activeReminders = reminders.filter((reminder) => reminder.status === 'todo');
   const latestClient = clients[0];
 
@@ -284,6 +295,46 @@ export default function AdminPanel() {
     }
   }, [authenticated, selectedClientId]);
 
+  useEffect(() => {
+    if (!authenticated || !reportClientId) {
+      return;
+    }
+
+    if (reportDraft === lastSavedReport.current) {
+      setReportSaveState(reportDraft ? 'saved' : 'idle');
+      return;
+    }
+
+    setReportSaveState('saving');
+
+    const timeout = setTimeout(async () => {
+      const reportToSave = reportDraft;
+
+      try {
+        const data = await requestJson<{ client: Client }>(
+          `/api/admin/clients/${reportClientId}/report`,
+          {
+            body: JSON.stringify({ report: reportToSave }),
+            method: 'PATCH',
+          },
+        );
+
+        lastSavedReport.current = reportToSave;
+        setClients((currentClients) =>
+          currentClients.map((client) =>
+            client.id === data.client.id ? data.client : client,
+          ),
+        );
+        setReportSaveState('saved');
+      } catch (requestError) {
+        setReportSaveState('error');
+        setError((requestError as Error).message);
+      }
+    }, 700);
+
+    return () => clearTimeout(timeout);
+  }, [authenticated, reportClientId, reportDraft]);
+
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError('');
@@ -356,7 +407,34 @@ export default function AdminPanel() {
 
     await requestJson(`/api/admin/clients/${clientId}`, { method: 'DELETE' });
     setSelectedClientId('');
+    if (reportClientId === clientId) {
+      setReportClientId('');
+      setReportDraft('');
+    }
     await loadAll();
+  }
+
+  function openReport(client: Client) {
+    const report = client.report ?? '';
+
+    lastSavedReport.current = report;
+    setReportClientId(client.id);
+    setReportDraft(report);
+    setReportCopied(false);
+    setReportSaveState(report ? 'saved' : 'idle');
+  }
+
+  function closeReport() {
+    setReportClientId('');
+    setReportDraft('');
+    setReportCopied(false);
+    setReportSaveState('idle');
+  }
+
+  async function copyReport() {
+    await navigator.clipboard.writeText(reportDraft);
+    setReportCopied(true);
+    window.setTimeout(() => setReportCopied(false), 1400);
   }
 
   async function saveNote(event: FormEvent<HTMLFormElement>) {
@@ -423,7 +501,7 @@ export default function AdminPanel() {
       category: (resource.category as RecipeCategory) ?? 'petit-dejeuner',
       content: resource.content ?? '',
       description: resource.description ?? '',
-      difficulty: resource.difficulty ?? 'Facile',
+      difficulty: normalizeRecipeDifficulty(resource.difficulty),
       image: resource.image ?? '',
       note: resource.note ?? '',
       prep_time: resource.prep_time ?? '',
@@ -743,6 +821,15 @@ export default function AdminPanel() {
                   </span>
                 </button>
                 <div className="item-actions">
+                  <button
+                    aria-label={`Ouvrir le compte rendu de ${clientName(client)}`}
+                    className="icon-button"
+                    onClick={() => openReport(client)}
+                    title="Compte rendu"
+                    type="button"
+                  >
+                    <span aria-hidden="true">✎</span>
+                  </button>
                   <button onClick={() => editClient(client)} type="button">
                     Modifier
                   </button>
@@ -995,7 +1082,7 @@ export default function AdminPanel() {
                       onChange={(event) =>
                         setResourceForm({
                           ...resourceForm,
-                          category: event.target.value,
+                          category: event.target.value as RecipeCategory,
                         })
                       }
                       required
@@ -1096,7 +1183,10 @@ export default function AdminPanel() {
                 <span>{resourceTypeLabels[resource.type]}</span>
                 <p>{resource.title}</p>
                 {resource.type === 'recipe' && resource.category && (
-                  <small>{getRecipeCategoryLabel(resource.category)}</small>
+                  <small>
+                    {getRecipeCategoryLabel(resource.category)} ·{' '}
+                    {getRecipeDifficultyLabel(resource.difficulty)}
+                  </small>
                 )}
                 {(resource.description || resource.content) && (
                   <small>{resource.description ?? resource.content}</small>
@@ -1122,6 +1212,64 @@ export default function AdminPanel() {
           </div>
         </article>
       </section>
+
+      {reportClient && (
+        <div className="report-layer" onClick={closeReport}>
+          <aside
+            aria-label={`Compte rendu de ${clientName(reportClient)}`}
+            className="report-panel"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <header className="report-panel-header">
+              <div>
+                <p className="admin-eyebrow">Compte rendu</p>
+                <h2>{clientName(reportClient)}</h2>
+                <span className={`report-status is-${reportSaveState}`}>
+                  {reportCopied
+                    ? 'Copié'
+                    : reportSaveState === 'saving'
+                      ? 'Sauvegarde en cours'
+                      : reportSaveState === 'saved'
+                        ? 'Sauvegardé'
+                        : reportSaveState === 'error'
+                          ? 'Erreur de sauvegarde'
+                          : 'Prêt'}
+                </span>
+              </div>
+              <div className="report-panel-actions">
+                <button
+                  aria-label="Copier le compte rendu"
+                  className="icon-button"
+                  disabled={!reportDraft.trim()}
+                  onClick={copyReport}
+                  title="Copier"
+                  type="button"
+                >
+                  <span aria-hidden="true">⧉</span>
+                </button>
+                <button
+                  aria-label="Fermer le compte rendu"
+                  className="icon-button"
+                  onClick={closeReport}
+                  title="Fermer"
+                  type="button"
+                >
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+            </header>
+            <textarea
+              className="report-editor"
+              onChange={(event) => {
+                setReportDraft(event.target.value);
+                setReportCopied(false);
+              }}
+              placeholder="Compte rendu libre, observations générales, éléments transmis, points à revoir..."
+              value={reportDraft}
+            />
+          </aside>
+        </div>
+      )}
     </main>
   );
 }

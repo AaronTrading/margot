@@ -13,6 +13,7 @@ create table if not exists public.clients (
   height_cm numeric(5, 2),
   allergies text,
   intolerances text,
+  report text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -44,9 +45,15 @@ create table if not exists public.resources (
   content text,
   note text,
   description text,
-  category text check (category in ('petit-dejeuner', 'dejeuner', 'diner', 'collation')),
+  category text check (
+    category is null
+    or category in ('petit-dejeuner', 'dejeuner', 'diner', 'collation')
+  ),
   prep_time text,
-  difficulty text check (difficulty in ('Facile', 'Intermédiaire', 'Difficile')),
+  difficulty text check (
+    difficulty is null
+    or difficulty in ('Facile', 'Intermédiaire', 'Difficile')
+  ),
   image text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -58,6 +65,9 @@ alter table public.resources
   add column if not exists prep_time text,
   add column if not exists difficulty text,
   add column if not exists image text;
+
+alter table public.clients
+  add column if not exists report text;
 
 update public.resources
 set category = 'petit-dejeuner'
@@ -75,15 +85,33 @@ update public.resources
 set category = 'collation'
 where category = 'snack';
 
+update public.resources
+set difficulty = 'Facile'
+where lower(difficulty) = 'easy';
+
+update public.resources
+set difficulty = 'Intermédiaire'
+where lower(difficulty) in ('medium', 'intermediate', 'intermediaire');
+
+update public.resources
+set difficulty = 'Difficile'
+where lower(difficulty) = 'hard';
+
 alter table public.resources drop constraint if exists resources_category_check;
 alter table public.resources
   add constraint resources_category_check
-  check (category in ('petit-dejeuner', 'dejeuner', 'diner', 'collation'));
+  check (
+    category is null
+    or category in ('petit-dejeuner', 'dejeuner', 'diner', 'collation')
+  );
 
 alter table public.resources drop constraint if exists resources_difficulty_check;
 alter table public.resources
   add constraint resources_difficulty_check
-  check (difficulty in ('Facile', 'Intermédiaire', 'Difficile'));
+  check (
+    difficulty is null
+    or difficulty in ('Facile', 'Intermédiaire', 'Difficile')
+  );
 
 create or replace function public.set_updated_at()
 returns trigger
