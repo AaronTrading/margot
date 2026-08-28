@@ -53,7 +53,7 @@ main {
   border-bottom: 1px solid var(--line);
   display: grid;
   gap: 14px;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr auto auto;
   left: 0;
   padding: 14px 18px;
   position: sticky;
@@ -90,6 +90,19 @@ main {
 
 .site-header nav {
   display: none;
+}
+
+.mobile-recipes-link {
+  color: var(--brown);
+  font-size: 0.76rem;
+  font-weight: 500;
+  justify-self: end;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.mobile-recipes-link[aria-current='page'] {
+  color: var(--caramel);
 }
 
 .header-action,
@@ -261,6 +274,12 @@ h3 {
   line-height: 1.85;
   margin-bottom: 0;
   max-width: 760px;
+}
+
+.intro-copy {
+  display: grid;
+  gap: 20px;
+  justify-items: start;
 }
 
 .content-section,
@@ -480,6 +499,10 @@ h3 {
     align-items: center;
     display: flex;
     gap: 24px;
+  }
+
+  .mobile-recipes-link {
+    display: none;
   }
 
   .site-header nav a {

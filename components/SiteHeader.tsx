@@ -27,6 +27,13 @@ export function SiteHeader({ active }: SiteHeaderProps) {
         </a>
         <a href="/#cabinet">Cabinet</a>
       </nav>
+      <a
+        className="mobile-recipes-link"
+        href="/recettes"
+        aria-current={active === 'recettes' ? 'page' : undefined}
+      >
+        Recettes
+      </a>
       <a className="header-action" href={doctolibUrl} {...externalLinkProps}>
         RDV
       </a>

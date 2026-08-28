@@ -63,12 +63,17 @@ export default function Home() {
           <p className="eyebrow">Une méthode simple</p>
           <h2>Avancer par petites habitudes, pas par interdits.</h2>
         </div>
-        <p>
-          L'objectif est de comprendre votre quotidien, vos contraintes, votre
-          activité et votre rapport à l'alimentation. Les conseils sont ajustés
-          à votre rythme pour construire des changements qui tiennent dans la
-          vraie vie.
-        </p>
+        <div className="intro-copy">
+          <p>
+            L'objectif est de comprendre votre quotidien, vos contraintes, votre
+            activité et votre rapport à l'alimentation. Les conseils sont ajustés
+            à votre rythme pour construire des changements qui tiennent dans la
+            vraie vie.
+          </p>
+          <a className="secondary-button" href="/recettes">
+            Voir mes recettes
+          </a>
+        </div>
       </section>
 
       <section className="content-section" id="consultations">
