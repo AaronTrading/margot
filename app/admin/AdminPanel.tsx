@@ -515,18 +515,24 @@ export default function AdminPanel() {
 
   async function saveResource(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setError('');
+
     const url = editingResourceId
       ? `/api/admin/resources/${editingResourceId}`
       : '/api/admin/resources';
     const method = editingResourceId ? 'PATCH' : 'POST';
 
-    await requestJson(url, {
-      body: JSON.stringify(resourceForm),
-      method,
-    });
-    setEditingResourceId('');
-    setResourceForm(emptyResource);
-    await loadAll();
+    try {
+      await requestJson(url, {
+        body: JSON.stringify(resourceForm),
+        method,
+      });
+      setEditingResourceId('');
+      setResourceForm(emptyResource);
+      await loadAll();
+    } catch (requestError) {
+      setError((requestError as Error).message);
+    }
   }
 
   async function deleteResource(resourceId: string) {

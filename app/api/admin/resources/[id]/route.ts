@@ -28,6 +28,7 @@ export async function PATCH(request: Request, context: Context) {
       unknown
     >;
     const payload = resourcePayload(body);
+    const supabase = getSupabaseAdmin();
 
     if (payload.type === 'recipe' && !payload.category) {
       return Response.json(
@@ -36,12 +37,32 @@ export async function PATCH(request: Request, context: Context) {
       );
     }
 
-    const { data, error } = await getSupabaseAdmin()
+    const { data: existingResource, error: lookupError } = await supabase
+      .from('resources')
+      .select('id')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (lookupError) {
+      return supabaseErrorResponse(lookupError, 'lecture de la ressource');
+    }
+
+    if (!existingResource) {
+      return Response.json(
+        {
+          error:
+            'Cette ressource est introuvable. Recharge la page admin avant de réessayer.',
+        },
+        { status: 404 },
+      );
+    }
+
+    const { data, error } = await supabase
       .from('resources')
       .update(payload)
       .eq('id', id)
       .select('*')
-      .single();
+      .maybeSingle();
 
     if (error) {
       if (error.code === '23505') {
@@ -55,6 +76,16 @@ export async function PATCH(request: Request, context: Context) {
       }
 
       return supabaseErrorResponse(error, 'modification de la ressource');
+    }
+
+    if (!data) {
+      return Response.json(
+        {
+          error:
+            'La ressource existe, mais Supabase n’a renvoyé aucune ligne après modification. Vérifie que SUPABASE_SERVICE_ROLE_KEY contient bien la clé secrète/service role dans Vercel, puis redéploie.',
+        },
+        { status: 500 },
+      );
     }
 
     return Response.json({ resource: data });
