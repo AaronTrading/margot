@@ -42,8 +42,7 @@ img {
 }
 
 main {
-  background:
-    linear-gradient(180deg, var(--white) 0%, var(--linen) 48%, var(--white) 100%);
+  background: var(--linen);
   overflow: hidden;
 }
 
@@ -143,6 +142,7 @@ main {
 }
 
 .hero {
+  background: var(--linen);
   display: grid;
   gap: 28px;
   padding: 38px 18px 46px;
@@ -288,6 +288,10 @@ h3 {
   padding: 56px 18px;
 }
 
+.content-section {
+  background: var(--linen);
+}
+
 .areas-grid,
 .practical-grid {
   display: grid;
@@ -375,7 +379,7 @@ h3 {
 }
 
 .cabinet-section {
-  background: var(--white);
+  background: var(--linen);
 }
 
 .info-card {
