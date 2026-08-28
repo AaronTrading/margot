@@ -63,6 +63,16 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
+      if (error.code === '23505') {
+        return Response.json(
+          {
+            error:
+              'Cette adresse de recette existe déjà. Choisis une URL différente.',
+          },
+          { status: 400 },
+        );
+      }
+
       return supabaseErrorResponse(error, 'création de la ressource');
     }
 

@@ -65,7 +65,7 @@ export function RecipesGrid({ recipes }: RecipesGridProps) {
           {filteredRecipes.map((recipe) => (
             <Link
               className="recipe-card"
-              href={`/recettes/${recipe.id}`}
+              href={`/recettes/${recipe.slug ?? recipe.id}`}
               key={recipe.id}
             >
               <div className="recipe-card-media">

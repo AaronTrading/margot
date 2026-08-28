@@ -14,7 +14,7 @@ export {
 } from '@/lib/resources';
 
 const recipeSelect =
-  'id, title, description, category, prep_time, difficulty, image, content, created_at';
+  'id, slug, title, description, category, prep_time, difficulty, image, content, created_at';
 
 export async function getRecipes(): Promise<Recipe[]> {
   try {
@@ -37,13 +37,21 @@ export async function getRecipes(): Promise<Recipe[]> {
 }
 
 export async function getRecipeById(id: string): Promise<Recipe | null> {
+  const isUuid =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      id,
+    );
+
   try {
-    const { data, error } = await getSupabaseAdmin()
+    let query = getSupabaseAdmin()
       .from('resources')
       .select(recipeSelect)
       .eq('type', 'recipe')
-      .eq('id', id)
-      .maybeSingle();
+      .limit(1);
+
+    query = isUuid ? query.eq('id', id) : query.eq('slug', id);
+
+    const { data, error } = await query.maybeSingle();
 
     if (error) {
       console.error('[recipes]', error);

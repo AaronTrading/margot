@@ -18,6 +18,7 @@ export type RecipeResourceRow = {
   image: string | null;
   note: string | null;
   prep_time: string | null;
+  slug: string | null;
   title: string;
   type: ResourceType;
   updated_at: string;
@@ -25,6 +26,7 @@ export type RecipeResourceRow = {
 
 export type Recipe = {
   id: string;
+  slug: string | null;
   title: string;
   description: string;
   instructions: string;
@@ -106,6 +108,23 @@ export function getRecipeDifficultyLabel(
   return normalizeRecipeDifficulty(difficulty);
 }
 
+export function normalizeRecipeSlug(value: string | null | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  const slug = value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/&/g, ' et ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-');
+
+  return slug || null;
+}
+
 function normalizeText(value: unknown) {
   const normalized = normalizeEmpty(value);
 
@@ -129,6 +148,8 @@ function normalizeResourceType(value: unknown): ResourceType {
 
 export function resourcePayload(body: Record<string, unknown>) {
   const type = normalizeResourceType(body.type);
+  const title = normalizeText(body.title);
+  const requestedSlug = normalizeRecipeSlug(normalizeText(body.slug));
 
   return {
     category:
@@ -144,7 +165,8 @@ export function resourcePayload(body: Record<string, unknown>) {
     image: type === 'recipe' ? normalizeText(body.image) : null,
     note: normalizeText(body.note),
     prep_time: type === 'recipe' ? normalizeText(body.prep_time) : null,
-    title: normalizeText(body.title),
+    slug: type === 'recipe' ? requestedSlug ?? normalizeRecipeSlug(title) : null,
+    title,
     type,
   };
 }
@@ -152,6 +174,7 @@ export function resourcePayload(body: Record<string, unknown>) {
 export function mapResourceToRecipe(resource: RecipeResourceRow): Recipe {
   return {
     id: resource.id,
+    slug: resource.slug,
     title: resource.title,
     description: resource.description?.trim() || 'Recette à découvrir.',
     instructions: resource.content?.trim() || '',

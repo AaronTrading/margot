@@ -1,6 +1,10 @@
 import { requireAdmin } from '@/lib/adminAuth';
 import { resourcePayload } from '@/lib/resources';
-import { adminApiError, getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import {
+  adminApiError,
+  getSupabaseAdmin,
+  supabaseErrorResponse,
+} from '@/lib/supabaseAdmin';
 
 export const runtime = 'nodejs';
 
@@ -40,7 +44,17 @@ export async function PATCH(request: Request, context: Context) {
       .single();
 
     if (error) {
-      return Response.json({ error: error.message }, { status: 500 });
+      if (error.code === '23505') {
+        return Response.json(
+          {
+            error:
+              'Cette adresse de recette existe déjà. Choisis une URL différente.',
+          },
+          { status: 400 },
+        );
+      }
+
+      return supabaseErrorResponse(error, 'modification de la ressource');
     }
 
     return Response.json({ resource: data });
@@ -64,7 +78,7 @@ export async function DELETE(_request: Request, context: Context) {
       .eq('id', id);
 
     if (error) {
-      return Response.json({ error: error.message }, { status: 500 });
+      return supabaseErrorResponse(error, 'suppression de la ressource');
     }
 
     return Response.json({ ok: true });

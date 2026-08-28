@@ -66,6 +66,7 @@ type Resource = {
   image: string | null;
   note: string | null;
   prep_time: string | null;
+  slug: string | null;
   title: string;
   type: ResourceType;
   updated_at: string;
@@ -111,6 +112,7 @@ const emptyResource = {
   image: '',
   note: '',
   prep_time: '',
+  slug: '',
   title: '',
   type: 'advice',
 };
@@ -505,6 +507,7 @@ export default function AdminPanel() {
       image: resource.image ?? '',
       note: resource.note ?? '',
       prep_time: resource.prep_time ?? '',
+      slug: resource.slug ?? '',
       title: resource.title,
       type: resource.type,
     });
@@ -1138,6 +1141,19 @@ export default function AdminPanel() {
                   />
                 </label>
                 <label>
+                  Adresse de la recette
+                  <input
+                    onChange={(event) =>
+                      setResourceForm({
+                        ...resourceForm,
+                        slug: event.target.value,
+                      })
+                    }
+                    placeholder="porridge-pomme-cannelle"
+                    value={resourceForm.slug}
+                  />
+                </label>
+                <label>
                   Instructions ou lien
                   <textarea
                     onChange={(event) =>
@@ -1187,6 +1203,9 @@ export default function AdminPanel() {
                     {getRecipeCategoryLabel(resource.category)} ·{' '}
                     {getRecipeDifficultyLabel(resource.difficulty)}
                   </small>
+                )}
+                {resource.type === 'recipe' && (
+                  <small>URL : /recettes/{resource.slug ?? resource.id}</small>
                 )}
                 {(resource.description || resource.content) && (
                   <small>{resource.description ?? resource.content}</small>

@@ -28,7 +28,7 @@ const checks = [
   {
     name: 'resources',
     select:
-      'id,title,type,content,note,description,category,prep_time,difficulty,image,created_at,updated_at',
+      'id,title,type,content,note,description,category,prep_time,difficulty,image,slug,created_at,updated_at',
     table: 'resources',
   },
   {

@@ -55,6 +55,7 @@ create table if not exists public.resources (
     or difficulty in ('Facile', 'Intermédiaire', 'Difficile')
   ),
   image text,
+  slug text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -64,7 +65,8 @@ alter table public.resources
   add column if not exists category text,
   add column if not exists prep_time text,
   add column if not exists difficulty text,
-  add column if not exists image text;
+  add column if not exists image text,
+  add column if not exists slug text;
 
 alter table public.clients
   add column if not exists report text;
@@ -97,6 +99,48 @@ update public.resources
 set difficulty = 'Difficile'
 where lower(difficulty) = 'hard';
 
+with recipe_slug_base as (
+  select
+    id,
+    nullif(
+      trim(
+        both '-' from regexp_replace(
+          lower(
+            translate(
+              title,
+              'ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝŸàáâãäåçèéêëìíîïñòóôõöùúûüýÿ',
+              'AAAAAACEEEEIIIINOOOOOUUUUYYaaaaaaceeeeiiiinooooouuuuyy'
+            )
+          ),
+          '[^a-z0-9]+',
+          '-',
+          'g'
+        )
+      ),
+      ''
+    ) as base_slug
+  from public.resources
+  where type = 'recipe'
+    and slug is null
+),
+recipe_slug_ranked as (
+  select
+    id,
+    coalesce(base_slug, 'recette-' || left(id::text, 8)) as base_slug,
+    row_number() over (
+      partition by coalesce(base_slug, 'recette-' || left(id::text, 8))
+      order by id
+    ) as duplicate_rank
+  from recipe_slug_base
+)
+update public.resources
+set slug = case
+  when recipe_slug_ranked.duplicate_rank = 1 then recipe_slug_ranked.base_slug
+  else recipe_slug_ranked.base_slug || '-' || recipe_slug_ranked.duplicate_rank
+end
+from recipe_slug_ranked
+where public.resources.id = recipe_slug_ranked.id;
+
 alter table public.resources drop constraint if exists resources_category_check;
 alter table public.resources
   add constraint resources_category_check
@@ -111,6 +155,14 @@ alter table public.resources
   check (
     difficulty is null
     or difficulty in ('Facile', 'Intermédiaire', 'Difficile')
+  );
+
+alter table public.resources drop constraint if exists resources_slug_format_check;
+alter table public.resources
+  add constraint resources_slug_format_check
+  check (
+    slug is null
+    or slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'
   );
 
 create or replace function public.set_updated_at()
@@ -153,3 +205,6 @@ create index if not exists client_notes_client_id_idx on public.client_notes(cli
 create index if not exists reminders_status_due_date_idx on public.reminders(status, due_date);
 create index if not exists reminders_client_id_idx on public.reminders(client_id);
 create index if not exists resources_type_idx on public.resources(type);
+create unique index if not exists resources_recipe_slug_unique
+on public.resources(slug)
+where type = 'recipe' and slug is not null;
