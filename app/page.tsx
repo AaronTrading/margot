@@ -100,10 +100,9 @@ export default function Home() {
         </div>
         <div className="text-panel">
           <p className="eyebrow">Déroulement</p>
-          <h2>Une première consultation pour poser les bases.</h2>
           <div className="price-row">
             <div>
-              <strong>70€</strong>
+              <strong>70€ la première consultation</strong>
               <span>
                 Le premier rendez-vous permet de faire le point sur vos habitudes
                 alimentaires, vos objectifs et votre quotidien afin de construire
@@ -111,7 +110,7 @@ export default function Home() {
               </span>
             </div>
             <div>
-              <strong>55€</strong>
+              <strong>55€ la consultation de suivi</strong>
               <span>
                 Les rendez-vous de suivi permettent ensuite d’ajuster les
                 conseils, de faire le point sur vos progrès et vos difficultés,
