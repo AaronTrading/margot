@@ -30,7 +30,7 @@ export default function Home() {
       <section className="hero" id="accueil">
         <div className="hero-copy">
           <p className="eyebrow">Saint-Alban - 31140</p>
-          <h1>Margot, diététicienne nutritionniste D.E à Saint-Alban</h1>
+          <h1>Margot, Diététicienne Nutritionniste à Saint-Alban</h1>
           <p className="lead">
             Un accompagnement nutritionnel personnalisé et bienveillant, pour
             vous aider à retrouver une alimentation qui vous ressemble, sans
@@ -94,7 +94,7 @@ export default function Home() {
       <section className="split-section">
         <div className="image-panel">
           <img
-            src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1100&q=82"
+            src="/imagenourriture.jpg"
             alt="Salade fraîche préparée dans un bol"
           />
         </div>
@@ -103,23 +103,21 @@ export default function Home() {
           <h2>Une première consultation pour poser les bases.</h2>
           <div className="price-row">
             <div>
-              <strong>70 €</strong>
-              <span>Première consultation</span>
-              <p>
+              <strong>70€</strong>
+              <span>
                 Le premier rendez-vous permet de faire le point sur vos habitudes
                 alimentaires, vos objectifs et votre quotidien afin de construire
                 un accompagnement adapté à vos besoins.
-              </p>
+              </span>
             </div>
             <div>
-              <strong>55 €</strong>
-              <span>Consultation de suivi</span>
-              <p>
+              <strong>55€</strong>
+              <span>
                 Les rendez-vous de suivi permettent ensuite d’ajuster les
                 conseils, de faire le point sur vos progrès et vos difficultés,
                 et surtout d’avancer progressivement vers des changements
                 durables.
-              </p>
+              </span>
             </div>
           </div>
         </div>

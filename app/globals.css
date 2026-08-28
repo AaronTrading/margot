@@ -370,13 +370,8 @@ h3 {
 
 .price-row span {
   color: var(--muted);
-}
-
-.price-row p {
-  color: var(--brown);
-  font-size: 0.92rem;
+  font-size: 0.94rem;
   line-height: 1.65;
-  margin: 6px 0 0;
 }
 
 .cabinet-section {
