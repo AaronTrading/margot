@@ -150,8 +150,7 @@ main {
 
 .hero-copy,
 .section-heading,
-.text-panel,
-.final-cta {
+.text-panel {
   max-width: 740px;
 }
 
@@ -444,6 +443,10 @@ h3 {
 .final-cta {
   background: var(--brown);
   color: var(--white);
+}
+
+.final-cta > * {
+  max-width: 740px;
 }
 
 .final-cta h2 {
