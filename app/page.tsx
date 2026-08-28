@@ -105,20 +105,23 @@ export default function Home() {
             <div>
               <strong>70 €</strong>
               <span>Première consultation</span>
+              <p>
+                Le premier rendez-vous permet de faire le point sur vos habitudes
+                alimentaires, vos objectifs et votre quotidien afin de construire
+                un accompagnement adapté à vos besoins.
+              </p>
             </div>
             <div>
               <strong>55 €</strong>
               <span>Consultation de suivi</span>
+              <p>
+                Les rendez-vous de suivi permettent ensuite d’ajuster les
+                conseils, de faire le point sur vos progrès et vos difficultés,
+                et surtout d’avancer progressivement vers des changements
+                durables.
+              </p>
             </div>
           </div>
-          <p>
-            Le premier rendez-vous permet de faire le point sur vos habitudes
-            alimentaires, vos objectifs et votre quotidien afin de construire un
-            accompagnement adapté à vos besoins. Les rendez-vous de suivi
-            permettent ensuite d’ajuster les conseils, de faire le point sur vos
-            progrès et vos difficultés, et surtout d’avancer progressivement
-            vers des changements durables.
-          </p>
         </div>
       </section>
 
