@@ -10,7 +10,7 @@ const supportAreas = [
   'Surpoids et obésité',
   'Intolérances alimentaires',
   'Consultation enfant',
-  'Suivi adulte',
+  'Prise de masse',
 ];
 
 const hours = [
@@ -30,11 +30,11 @@ export default function Home() {
       <section className="hero" id="accueil">
         <div className="hero-copy">
           <p className="eyebrow">Saint-Alban - 31140</p>
-          <h1>Margot Atlani, diététicienne à Saint-Alban</h1>
+          <h1>Margot, diététicienne nutritionniste D.E à Saint-Alban</h1>
           <p className="lead">
-            Un accompagnement nutritionnel clair, concret et bienveillant pour
-            retrouver une alimentation qui vous ressemble, sans discours
-            culpabilisant.
+            Un accompagnement nutritionnel personnalisé et bienveillant, pour
+            vous aider à retrouver une alimentation qui vous ressemble, sans
+            frustration, sans culpabilité et sans interdits.
           </p>
           <div className="hero-actions" aria-label="Actions principales">
             <a className="primary-button" href={doctolibUrl} {...externalLinkProps}>
@@ -101,11 +101,6 @@ export default function Home() {
         <div className="text-panel">
           <p className="eyebrow">Déroulement</p>
           <h2>Une première consultation pour poser les bases.</h2>
-          <p>
-            Le premier rendez-vous permet de faire le point sur vos habitudes,
-            vos objectifs et votre santé. Les suivis servent ensuite à ajuster
-            les conseils, garder le cap et rendre les changements plus naturels.
-          </p>
           <div className="price-row">
             <div>
               <strong>70 €</strong>
@@ -116,13 +111,21 @@ export default function Home() {
               <span>Consultation de suivi</span>
             </div>
           </div>
+          <p>
+            Le premier rendez-vous permet de faire le point sur vos habitudes
+            alimentaires, vos objectifs et votre quotidien afin de construire un
+            accompagnement adapté à vos besoins. Les rendez-vous de suivi
+            permettent ensuite d’ajuster les conseils, de faire le point sur vos
+            progrès et vos difficultés, et surtout d’avancer progressivement
+            vers des changements durables.
+          </p>
         </div>
       </section>
 
       <section className="content-section cabinet-section" id="cabinet">
         <div className="section-heading">
           <p className="eyebrow">Infos pratiques</p>
-          <h2>Cabinet au sein de CrossFit Naveli</h2>
+          <h2>Cabinet au sein de la salle CrossFit Naveli</h2>
         </div>
         <div className="practical-grid">
           <article className="info-card">
@@ -139,8 +142,8 @@ export default function Home() {
             <p>
               <a href="tel:+33777203145">07 77 20 31 45</a>
               <br />
-              <a href={instagramUrl} {...externalLinkProps}>
-                @margot.diet
+              <a href="mailto:margotatlanidiet@gmail.com">
+                margotatlanidiet@gmail.com
               </a>
             </p>
             <p className="muted">Rendez-vous en ligne via Doctolib.</p>
